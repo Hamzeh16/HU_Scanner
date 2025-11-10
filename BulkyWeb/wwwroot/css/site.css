@@ -1,0 +1,67 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.divider-text::before,
+.divider-text::after
+{
+    color:white;
+    content:"";
+    flex:1;
+    border-bottom:1px solid #555;
+    margin: auto 0 25rem;
+    box-shadow: 0 -2px;
+}
+
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.center-container {
+    display: flex; /* Enable Flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+}
+
+.light {
+    width: 10px; /* Size of the light */
+    height: 10px; /* Size of the light */
+    border-radius: 50%; /* Make it circular */
+    display: inline-block;
+    margin:10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Slight glow effect */
+}
+
+/* Red light (e.g., for inactive status) */
+.red {
+    background-color: red;
+}
+
+/* Green light (e.g., for active status) */
+.green {
+    background-color: green;
+}
+
+.yelow{
+    background-color:yellow;
+}
+
+.TextCenter{
+    text-align:center;
+}

@@ -1,0 +1,79 @@
+﻿body {
+    font-family: 'Arial', sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa; /* خلفية هادئة */
+    color: #333; /* لون النص */
+}
+
+h2 {
+    text-align: center;
+    color: #007BFF; /* لون أزرق رسمي */
+    margin-bottom: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* تأثير ظل خفيف */
+}
+
+    .table th,
+    .table td {
+        padding: 10px 15px;
+        text-align: left;
+        border: 1px solid #ddd; /* حدود خفيفة */
+    }
+
+    .table th {
+        background-color: #007BFF; /* لون رأس الجدول */
+        color: white; /* لون النص في الرأس */
+        text-transform: uppercase; /* تحويل النص إلى أحرف كبيرة */
+        font-size: 14px;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2; /* صفوف بلون مختلف */
+    }
+
+    .table tbody tr:hover {
+        background-color: #e9ecef; /* تأثير عند تمرير الماوس */
+    }
+
+.btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+form {
+    display: inline-block; /* لمنع الأزرار من التداخل */
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}

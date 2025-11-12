@@ -2,75 +2,91 @@
 @model RegisterModel
 
 <title> Registration or Sign Up </title>
-<link rel="stylesheet" href="~/css/style1.css">
+<link rel="stylesheet" href="~/css/Login.css" />
+<script src="~/js/Login.js" defer></script>
 
-<div class="wrapper">
-    <h2>Registration</h2>
-    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
-
-        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-
-        <div class="input-box">
-            <input asp-for="Input.FirstName" type="text" placeholder="Enter your first name" required>
-            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-        </div>
-        <div class="input-box">
-            <input asp-for="Input.LastName" type="text" placeholder="Enter your last name" required>
-            <span asp-validation-for="Input.LastName" class="text-danger"></span>
-        </div>
-        <div class="input-box">
-            <input asp-for="Input.IDNumber" type="number" placeholder="ID" required>
-            <span asp-validation-for="Input.IDNumber" class="text-danger"></span>
-        </div>
-        <div class="input-box">
-            <input asp-for="Input.Email" type="text" placeholder="Enter your email" required>
-            <span asp-validation-for="Input.Email" class="text-danger"></span>
-        </div>
-        <div class="input-box">
-            <input asp-for="Input.PhoneNumber" type="text" placeholder="Phone Number" required>
-            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-        </div>
-
-        <div class="input-box">
-            <input asp-for="Input.Password" type="password" placeholder="Create password" required>
-            <span asp-validation-for="Input.Password" class="text-danger"></span>
-        </div>
-        <div class="input-box">
-            <input asp-for="Input.ConfirmPassword" type="password" placeholder="Confirm password" required>
-            <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label for="roleDropdown">Select Role:</label>
-            @* 
-              هذا الكود الآن يقرأ الأدوار من الكود الخلفي (RegisterModel.cs) 
-              مما يجعله متوافقاً مع معايير ASP.NET Core
-            *@
-            <select asp-for="Input.Role" asp-items="Model.Input.RoleList" class="form-select" id="roleDropdown">
-                <option disabled selected>-- Select Role --</option>
-            </select>
-            <span asp-validation-for="Input.Role" class="text-danger"></span>
-        </div>
-
-        @* 
-          تم تحديث هذا القسم لإزالة الحقول غير الموجودة 
-          في ApplicationUser.cs والاحتفاظ برفع الصورة فقط 
-        *@
-        <div id="dynamicFields" style="display:none; width:100%; flex-direction:column;">
-            <div class="input-box">
-                <label>Profile Picture (For Doctor)</label>
-                <input asp-for="Input.ProfilePictureUrl" type="file" placeholder="Upload Image">
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Registration</h2>
+                <p>Enter your credentials to continue</p>
             </div>
-        </div>
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post" enctype="multipart/form-data">
 
-        <div class="input-box button">
-            <input type="Submit" value="Register Now">
+                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.FirstName" type="text" placeholder="Enter your first name" required>
+                        <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.LastName" type="text" placeholder="Enter your last name" required>
+                        <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.IDNumber" type="number" placeholder="ID" required>
+                        <span asp-validation-for="Input.IDNumber" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.Email" type="text" placeholder="Enter your email" required>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.PhoneNumber" type="text" placeholder="Phone Number" required>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.Password" type="password" placeholder="Create password" required>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input asp-for="Input.ConfirmPassword" type="password" placeholder="Confirm password" required>
+                        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="roleDropdown">Select Role:</label>
+
+                    <select asp-for="Input.Role" asp-items="Model.Input.RoleList" class="form-select" id="roleDropdown">
+                        <option disabled selected>-- Select Role --</option>
+                    </select>
+                    <span asp-validation-for="Input.Role" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <div id="dynamicFields" style="display:none; width:100%; flex-direction:column;">
+                        <div class="input-wrapper">
+                            <input asp-for="Input.ProfilePictureUrl" type="file" placeholder="Upload Image">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Sign Up</span>
+                    <span class="btn-loader"></span>
+                </button>
+                <div class="login-link">
+                    <h3>Already have an account? <a asp-area="Identity" asp-page="/Account/Login">Login now</a></h3>
+                </div>
+            </form>
         </div>
-        <div class="text">
-            <h3>Already have an account? <a asp-area="Identity" asp-page="/Account/Login">Login now</a></h3>
-        </div>
-    </form>
-</div>
+    </div>
+</body>
 
 @* أضف هذا القسم لتفعيل التحقق من صحة المدخلات في الواجهة الأمامية *@
 @section Scripts {

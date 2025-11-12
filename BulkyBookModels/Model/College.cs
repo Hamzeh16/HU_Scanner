@@ -1,5 +1,4 @@
-﻿using ScannerModels.Model;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ScannerModels.Model;
 

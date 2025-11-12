@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ScannerModels.Model;
+using ScannerUtility;
 using System.ComponentModel.DataAnnotations;
 
 namespace BulkyWeb.Areas.Identity.Pages.Account
@@ -116,6 +117,31 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     {
                         // Set session for user's email
                         HttpContext.Session.SetString("UserEmail", user.Email);
+                    }
+
+                    // 2. احصل على أدواره
+                    var roles = await _userManager.GetRolesAsync(user);
+
+                    // 3. أعد التوجيه بناءً على الدور
+                    if (roles.Contains(SD.Role_HR))
+                    {
+                        // أعد التوجيه إلى لوحة تحكم HR
+                        return RedirectToAction("Index", "HrDashboard");
+                    }
+                    else if (roles.Contains(SD.Role_Dean))
+                    {
+                        // أعد التوجيه إلى لوحة تحكم العميد (عندما تنشئها)
+                        return RedirectToAction("Index", "Dashboard", new { area = "Dean" });
+                    }
+                    else if (roles.Contains(SD.Role_HeadofDepartment))
+                    {
+                        // أعد التوجيه إلى لوحة تحكم الدكتور
+                        return RedirectToAction("Index", "HeadofDepartmentboard");
+                    }
+                    else if (roles.Contains(SD.Role_Docter))
+                    {
+                        // أعد التوجيه إلى لوحة تحكم الدكتور
+                        return RedirectToAction("Index", "DoctorDashboard");
                     }
 
                     _logger.LogInformation("User logged in.");

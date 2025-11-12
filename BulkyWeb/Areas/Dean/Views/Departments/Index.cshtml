@@ -1,0 +1,253 @@
+﻿@model IEnumerable<ScannerModels.Model.Department>
+@{
+    ViewData["Title"] = "Departments Management";
+    var staff = ViewBag.Staff as IEnumerable<dynamic>;
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(90deg, #dc3545 0%, #b02a37 100%);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 35px;
+        text-align: center;
+    }
+
+        .page-header h2 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .table {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        width: 100%;
+    }
+
+    thead.table-danger th {
+        color: #fff;
+        background-color: #dc3545;
+        border: none;
+        text-align: center;
+    }
+
+    td, th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    tbody tr:hover {
+        background-color: #fff5f5;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn {
+        font-weight: 500;
+        transition: 0.2s ease;
+    }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+    .btn-remove {
+        background-color: #b02a37;
+        color: #fff;
+        border: none;
+    }
+
+        .btn-remove:hover {
+            background-color: #a12833;
+        }
+
+    .role-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        color: #fff;
+        display: inline-block;
+    }
+
+    .role-head {
+        background-color: #198754;
+    }
+
+    .role-doctor {
+        background-color: #dc3545;
+    }
+
+    .section-title {
+        margin-top: 60px;
+        margin-bottom: 15px;
+        font-weight: 700;
+        color: #b02a37;
+        text-align: center;
+    }
+
+    .alert {
+        border-left: 4px solid #dc3545;
+    }
+
+    .action-btn {
+        background-color: #fff;
+        color: #dc3545;
+        border: 2px solid #dc3545;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .action-btn:hover {
+            background-color: #dc3545;
+            color: #fff;
+            transform: translateY(-2px);
+            text-decoration: none;
+        }
+
+        .action-btn.remove {
+            background-color: #b02a37;
+            border-color: #b02a37;
+            color: #fff;
+        }
+
+            .action-btn.remove:hover {
+                background-color: #9c1f2c;
+                border-color: #9c1f2c;
+            }
+
+</style>
+
+<div class="page-header">
+    <h2>🏛 Departments Management</h2>
+    <p class="mb-0">Manage departments, assign or remove Heads of Department</p>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info mt-3 mx-3">@TempData["msg"]</div>
+}
+
+<div class="container">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-danger">
+            <tr>
+                <th>#</th>
+                <th>Department Name</th>
+                <th>College</th>
+                <th>Current Head</th>
+                <th class="text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var dept in Model)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>@dept.DepartmentName</td>
+                    <td>@dept.College?.CollegeName</td>
+                    <td>
+                        @if (dept.Head != null)
+                        {
+                            <span class="badge bg-success px-3 py-2">
+                                @dept.Head.FirstName @dept.Head.LastName
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">— Not Assigned —</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            @if (dept.HeadUserID != null)
+                            {
+                                <form asp-area="Dean" asp-controller="Departments" asp-action="RemoveHead"
+                                      method="post" style="display:inline;">
+                                    <input type="hidden" name="departmentId" value="@dept.DepartmentID" />
+                                    <button type="submit" class="action-btn remove">
+                                        <i class="bi bi-person-x"></i> Remove Head
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—No Actions —</span>
+                            }
+                        </div>
+                    </td>
+
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<!-- ============== STAFF LIST SECTION ============== -->
+<h3 class="section-title">👩‍🏫 All College Staff (Heads & Doctors)</h3>
+
+<div class="container">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-danger">
+            <tr>
+                <th>#</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Actions</th>
+                @* <th>Actions</th> *@
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int j = 1;
+            }
+            @foreach (var u in staff)
+            {
+                var roleClass = u.Role == "Head of Department" ? "role-head" : "role-doctor";
+                <tr>
+                    <td>@j</td>
+                    <td>@u.FirstName @u.LastName</td>
+                    <td>@u.Email</td>
+                    <td>@u.ManagedDepartment?.DepartmentName</td>
+                    <td>
+                        <span class="role-badge @roleClass">@u.Role</span>
+
+                        @if (u.Role == "Doctor")
+                        {
+                            <form asp-area="Dean" asp-controller="Departments" asp-action="AssignDoctorAsHead"
+                                  method="post" style="display:inline;">
+                                <input type="hidden" name="userEmail" value="@u.Email" />
+                                <!-- Here we pick the first department; you can change logic -->
+                                <input type="hidden" name="departmentId" value="@Model.FirstOrDefault()?.DepartmentID" />
+                                <button type="submit" class="action-btn assign ms-2">
+                                    <i class="bi bi-arrow-up-circle"></i> Assign / Change Head
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                j++;
+            }
+        </tbody>
+
+    </table>
+</div>

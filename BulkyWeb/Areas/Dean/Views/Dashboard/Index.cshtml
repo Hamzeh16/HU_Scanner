@@ -1,0 +1,129 @@
+﻿<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(90deg, #dc3545 0%, #b02a37 100%);
+        color: #fff;
+        padding: 30px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        margin-bottom: 40px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        transition: all 0.3s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .stat-title {
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #dc3545;
+    }
+
+    /* ---- FIX BUTTON LAYERING ---- */
+    .actions {
+        margin-top: 60px;
+        text-align: center;
+        position: relative;
+        z-index: 1000; /* ensures on top of cards or hr */
+    }
+
+        .actions a {
+            margin: 10px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1001;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+            .actions a:hover {
+                transform: translateY(-3px);
+            }
+
+    .btn-outline-danger {
+        border-width: 2px;
+    }
+</style>
+
+<div class="dashboard-header text-center">
+    <h2>🎓 Dean Dashboard</h2>
+    <p class="lead mb-0">Overview of your college and departments</p>
+</div>
+
+<div class="container">
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-white">
+                <div class="card-body">
+                    <h5 class="stat-title">Departments</h5>
+                    <div class="stat-value">@Model.DepartmentsCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-white">
+                <div class="card-body">
+                    <h5 class="stat-title">Heads Assigned</h5>
+                    <div class="stat-value">@Model.HeadsCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-white">
+                <div class="card-body">
+                    <h5 class="stat-title">Doctors</h5>
+                    <div class="stat-value">@Model.DoctorsCount</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-white">
+                <div class="card-body">
+                    <h5 class="stat-title">Students</h5>
+                    <div class="stat-value">@Model.StudentsCount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIXED BUTTON SECTION -->
+    <div class="actions">
+        <a asp-area="Dean" asp-controller="Departments" asp-action="Index"
+           class="btn btn-outline-danger">
+            <i class="bi bi-building"></i> Manage Departments
+        </a>
+
+        <a asp-area="Dean" asp-controller="Users" asp-action="Index"
+           class="btn btn-danger text-white">
+            <i class="bi bi-person-lock"></i> Manage Users / Reset Passwords
+        </a>
+    </div>
+</div>

@@ -1,0 +1,126 @@
+﻿@using ScannerModels.Model
+@model IEnumerable<SectionVM>
+
+@{
+    var doctors = ViewBag.Doctors as List<ApplicationUser>;
+}
+
+<style>
+    body {
+        background: #f8f9fa;
+        font-family: "Segoe UI";
+    }
+
+    .page-header {
+        background: linear-gradient(90deg, #dc3545, #b02a37);
+        color: #fff;
+        padding: 25px;
+        text-align: center;
+        border-radius: 12px;
+        margin-bottom: 35px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .table {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+    }
+
+    thead {
+        background: #dc3545;
+        color: white;
+    }
+
+    .btn-red {
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        padding: 5px 12px;
+        border-radius: 6px;
+        font-weight: 600;
+        background: white;
+        transition: 0.2s;
+    }
+
+        .btn-red:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+    .btn-remove {
+        background: #b02a37;
+        color: white;
+        padding: 5px 12px;
+        border-radius: 6px;
+        border: none;
+    }
+</style>
+
+<div class="page-header">
+    <h2>📘 Manage Course Sections</h2>
+    <p>Assign doctors to each section</p>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info mx-3">@TempData["msg"]</div>
+}
+
+<div class="container">
+    <table class="table table-bordered table-striped align-middle">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Course</th>
+                <th>Section</th>
+                <th>Assigned Doctor</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var sec in Model)
+            {
+                <tr>
+                    <td>@sec.SectionID</td>
+                    <td>@sec.CourseName</td>
+                    <td>@sec.SectionNumber</td>
+
+                    <td>
+                        @if (sec.DoctorUserID != null)
+                        {
+                            <span class="badge bg-success">@sec.DoctorFullName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">— Not Assigned —</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (sec.DoctorUserID == null)
+                        {
+                            <form asp-action="AssignDoctor" method="post" class="d-inline">
+                                <input type="hidden" name="sectionId" value="@sec.SectionID" />
+                                <select name="doctorId" class="form-select d-inline w-auto">
+                                    @foreach (var d in doctors)
+                                    {
+                                        <option value="@d.Id">@d.FirstName @d.LastName</option>
+                                    }
+                                </select>
+                                <button class="btn-red ms-2">Assign</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="RemoveDoctor" method="post" class="d-inline">
+                                <input type="hidden" name="sectionId" value="@sec.SectionID" />
+                                <button class="btn-remove">Remove</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,105 @@
+﻿@model IEnumerable<ScannerModels.Model.CourseSection>
+
+<style>
+    body {
+        background: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(90deg, #dc3545, #b02a37);
+        color: #fff;
+        padding: 30px 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        margin-bottom: 35px;
+    }
+
+        .page-header h2 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+    .section-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 18px 22px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        transition: 0.2s ease;
+        border-left: 6px solid #dc3545;
+    }
+
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+    .section-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #dc3545;
+    }
+
+    .section-info {
+        color: #555;
+        margin-bottom: 12px;
+    }
+
+    .open-btn {
+        border: 2px solid #dc3545;
+        padding: 6px 14px;
+        border-radius: 6px;
+        color: #dc3545;
+        font-weight: 600;
+        transition: 0.25s ease;
+        text-decoration: none;
+    }
+
+        .open-btn:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="page-header">
+    <h2>📘 My Teaching Sections</h2>
+    <p class="mb-0">Manage attendance and student lists easily</p>
+</div>
+
+<div class="container">
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-warning mt-3">
+            You don't have any assigned sections yet.
+        </div>
+    }
+
+    @{
+        int i = 1;
+    }
+
+    @foreach (var sec in Model)
+    {
+        <div class="section-card">
+            <div class="section-title">
+                <span>#@i — @sec.Course.CourseName</span>
+            </div>
+
+            <div class="section-info">
+                <strong>Section:</strong> @sec.SectionNumber <br />
+                <strong>Department:</strong> @sec.Course.Department.DepartmentName
+            </div>
+
+            <a class="open-btn"
+               asp-action="Section"
+               asp-route-id="@sec.CourseSectionID">
+                Open Section →
+            </a>
+        </div>
+
+        i++;
+    }
+</div>

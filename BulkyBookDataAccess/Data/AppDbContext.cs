@@ -61,6 +61,7 @@ namespace ScannerDataAccess.Data
                .OnDelete(DeleteBehavior.Restrict); // منع حذف الدكتور إذا كان قد تحقق من سجلات
 
             SeedRoles(builder);
+            //SeedTestData(builder);
         }
 
         private static void SeedRoles(ModelBuilder builder)
@@ -73,6 +74,74 @@ namespace ScannerDataAccess.Data
             new IdentityRole() { Name = "Docter", ConcurrencyStamp = "4", NormalizedName = "Doctor" },
             new IdentityRole() { Name = "Student", ConcurrencyStamp = "5", NormalizedName = "Student" }
                 );
+        }
+
+        private void SeedTestData(ModelBuilder builder)
+        {
+            // ====== 1. Seed a Department ======
+            builder.Entity<Department>().HasData(
+                new Department
+                {
+                    DepartmentID = 1,
+                    DepartmentName = "Computer Science",
+                    CollegeID = 1,
+                    HeadUserID = null
+                }
+            );
+
+            // ====== 2. Seed College ======
+            builder.Entity<College>().HasData(
+                new College
+                {
+                    CollegeID = 1,
+                    CollegeName = "Engineering College",
+                    Building = "Building A",
+                    DeanUserID = null
+                }
+            );
+
+            // ====== 3. Seed a Doctor User ======
+            builder.Entity<ApplicationUser>().HasData(
+                new ApplicationUser
+                {
+                    Id = "doctor1",                     // MUST be string
+                    UserName = "doctor1@university.com",
+                    NormalizedUserName = "DOCTOR1@UNIVERSITY.COM",
+                    Email = "doctor1@university.com",
+                    NormalizedEmail = "DOCTOR1@UNIVERSITY.COM",
+                    EmailConfirmed = true,
+                    FirstName = "Omar",
+                    LastName = "Ali",
+                    TypeUser = "Doctor",
+                    SecurityStamp = Guid.NewGuid().ToString("D"),
+                    PasswordHash = "AQAAAAEAACcQAAAAENj2V9vYpWkz..." // Optional (if you want real login)
+                }
+            );
+
+            // ====== 4. Seed a Course ======
+            builder.Entity<Course>().HasData(
+                new Course
+                {
+                    CourseID = 1,
+                    CourseCode = "CS101",
+                    CourseName = "Programming Fundamentals",
+                    DepartmentID = 1
+                }
+            );
+
+            // ====== 5. Seed a CourseSection ======
+            builder.Entity<CourseSection>().HasData(
+                new CourseSection
+                {
+                    CourseSectionID = 1,
+                    CourseID = 1,
+                    SemesterID = 1,
+                    ClassroomID = 101,
+                    SectionNumber = 1,
+                    DoctorUserID = "doctor1",      // Assign Doctor to teach this
+                    TotpSecretKey = "TEST123456"   // static for testing
+                }
+            );
         }
     }
 }

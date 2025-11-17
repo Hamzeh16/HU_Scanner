@@ -28,8 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Doctor\Controllers\" />
-    <Folder Include="Areas\HeadOfDepartment\Controllers\" />
     <Folder Include="uploads\" />
   </ItemGroup>
 

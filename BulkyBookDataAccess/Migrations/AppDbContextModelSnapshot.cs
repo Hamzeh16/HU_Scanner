@@ -326,7 +326,7 @@ namespace ScannerDataAccess.Migrations
                     b.HasIndex("CourseSectionID", "StudentUserID", "AttendanceDate")
                         .IsUnique();
 
-                    b.ToTable("AttendanceLogs");
+                    b.ToTable("AttendanceLogs", (string)null);
                 });
 
             modelBuilder.Entity("ScannerModels.Model.College", b =>
@@ -352,7 +352,7 @@ namespace ScannerDataAccess.Migrations
                         .IsUnique()
                         .HasFilter("[DeanUserID] IS NOT NULL");
 
-                    b.ToTable("Colleges");
+                    b.ToTable("Colleges", (string)null);
                 });
 
             modelBuilder.Entity("ScannerModels.Model.Course", b =>
@@ -376,7 +376,7 @@ namespace ScannerDataAccess.Migrations
 
                     b.HasIndex("DepartmentID");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("ScannerModels.Model.CourseSection", b =>
@@ -414,7 +414,7 @@ namespace ScannerDataAccess.Migrations
 
                     b.HasIndex("DoctorId");
 
-                    b.ToTable("CourseSections");
+                    b.ToTable("CourseSections", (string)null);
                 });
 
             modelBuilder.Entity("ScannerModels.Model.Department", b =>
@@ -442,7 +442,7 @@ namespace ScannerDataAccess.Migrations
                         .IsUnique()
                         .HasFilter("[HeadUserID] IS NOT NULL");
 
-                    b.ToTable("Departments");
+                    b.ToTable("Departments", (string)null);
                 });
 
             modelBuilder.Entity("ScannerModels.Model.StudentEnrollment", b =>
@@ -472,7 +472,7 @@ namespace ScannerDataAccess.Migrations
 
                     b.HasIndex("StudentId");
 
-                    b.ToTable("StudentEnrollments");
+                    b.ToTable("StudentEnrollments", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,0 +1,236 @@
+﻿@using ScannerModels.Model
+@model ScannerModels.Model.CourseSection
+@{
+    ViewData["Title"] = "Section Attendance";
+    var absence = ViewBag.AbsenceCounts as Dictionary<string, int> ?? new Dictionary<string, int>();
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(90deg, #dc3545, #b02a37);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-bottom: 35px;
+    }
+
+        .page-header h2 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .summary-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        padding: 20px;
+    }
+
+    .qr-box {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 12px;
+        display: inline-block; /* أهم خطوة: حجم صغير حسب المحتوى */
+        text-align: center;
+    }
+
+    #qrContainer canvas,
+    #qrContainer img {
+        display: block;
+        margin: 0 auto; /* يجعل QR في المنتصف ويمنع التمدد */
+    }
+
+    .qr-caption {
+        margin-top: 8px; /* تقليل المسافة */
+        font-size: 13px;
+        color: #666;
+    }
+
+
+
+
+    .table {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    thead.table-danger th {
+        color: #fff;
+        background-color: #dc3545;
+        border: none;
+        text-align: center;
+    }
+
+    td, th {
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .btn-danger-soft {
+        background: #fff;
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        font-weight: 600;
+        border-radius: 6px;
+        padding: 6px 14px;
+        transition: 0.2s ease;
+    }
+
+        .btn-danger-soft:hover {
+            background: #dc3545;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+    .alert {
+        border-left: 4px solid #dc3545;
+    }
+</style>
+
+<div class="page-header">
+    <h2>📘 @Model.Course.CourseName - Section @Model.SectionNumber</h2>
+    <p class="mb-0">
+        Department: @Model.Course.Department?.DepartmentName
+    </p>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-info mx-3">@TempData["msg"]</div>
+}
+
+<div class="container mb-4">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="qr-box">
+                <div id="qrContainer"></div>
+                <div class="qr-caption">
+                    Students scan this QR from their app to mark attendance.
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="summary-card">
+                <h5>Section Summary</h5>
+                <p class="mb-1"><strong>Course:</strong> @Model.Course.CourseName</p>
+                <p class="mb-1"><strong>Section:</strong> @Model.SectionNumber</p>
+                <p class="mb-1"><strong>Total Students:</strong> @Model.Enrollments?.Count()</p>
+
+                <a asp-action="DownloadExcel"
+                   asp-route-id="@Model.CourseSectionID"
+                   class="btn-danger-soft mt-3">
+                    📥 Download Students (Excel)
+                </a>
+
+                <form asp-action="UploadExcel" asp-route-id="@Model.CourseSectionID"
+                      method="post" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" name="file" accept=".csv" class="form-control mb-2" required />
+                    <button class="btn btn-danger-soft">⬆ Upload Excel</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <form asp-action="SaveAttendance" method="post">
+        <input type="hidden" name="sectionId" value="@Model.CourseSectionID" />
+
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-danger">
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>ID Number</th>
+                    <th>Email</th>
+                    <th>Absence Count</th>
+                    <th>Present</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 0;
+                    var students = ViewBag.EnrolledStudents as List<StudentEnrollment>;
+                }
+
+                @foreach (var e in students)
+                {
+                    if (e == null || e.Student == null)
+                        continue;
+
+                    var key = e.StudentUserID;
+                    int abs = absence.ContainsKey(key) ? absence[key] : 0;
+
+                    <tr>
+                        <td>@(++i)</td>
+                        <td>@e.Student.FirstName @e.Student.LastName</td>
+                        <td>@e.Student.IDNumber</td>
+                        <td>@e.Student.Email</td>
+                        <td>@abs</td>
+                        <td>
+                            <input type="hidden" name="students[@(i - 1)].StudentUserID" value="@e.StudentUserID" />
+                            <input type="checkbox" name="students[@(i - 1)].IsPresent" checked />
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+
+        </table>
+
+        <div class="d-flex justify-content-end mt-3">
+            <button type="submit" class="btn btn-danger">
+                💾 Save Attendance
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <!-- QRCode.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script>
+        const sectionId = @Model.CourseSectionID;
+        const qrContainer = document.getElementById("qrContainer");
+        let qr;
+
+        function renderQr(text) {
+            qrContainer.innerHTML = "";
+            qr = new QRCode(qrContainer, {
+                text: text,
+                width: 180,
+                height: 180
+            });
+        }
+
+        async function refreshQr() {
+            try {
+                const url = '@Url.Action("GenerateQr", "Dashboard", new { area = "Doctor", sectionId = Model.CourseSectionID })';
+                const resp = await fetch(url);
+                const data = await resp.json();
+                const payload = JSON.stringify(data);
+                renderQr(payload);
+            } catch (e) {
+                console.error("Error generating QR", e);
+            } finally {
+                setTimeout(refreshQr, 5000); // refresh every 5s
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            refreshQr();
+        });
+    </script>
+}

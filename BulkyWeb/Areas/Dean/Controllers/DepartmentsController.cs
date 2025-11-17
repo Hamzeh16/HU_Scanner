@@ -55,53 +55,6 @@ namespace ScannerWeb.Areas.Dean.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveHead(int departmentId)
-        {
-            var dept = await _context.Departments.FindAsync(departmentId);
-            if (dept == null)
-            {
-                TempData["msg"] = "Department not found.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (dept.HeadUserID != null)
-            {
-                // Find the current head user
-                var headUser = await _userManager.FindByIdAsync(dept.HeadUserID);
-
-                if (headUser != null)
-                {
-                    // Remove HeadOfDepartment role
-                    if (await _userManager.IsInRoleAsync(headUser, "HeadOfDepartment"))
-                    {
-                        await _userManager.RemoveFromRoleAsync(headUser, "HeadOfDepartment");
-                    }
-
-                    // Reassign as Doctor
-                    if (!await _userManager.IsInRoleAsync(headUser, "Doctor"))
-                    {
-                        await _userManager.AddToRoleAsync(headUser, "Doctor");
-                    }
-                }
-
-                // Remove head reference from department
-                dept.HeadUserID = null;
-                _context.Update(dept);
-                await _context.SaveChangesAsync();
-
-                TempData["msg"] = $"Head of Department '{headUser?.FirstName} {headUser?.LastName}' reverted to Doctor successfully.";
-            }
-            else
-            {
-                TempData["msg"] = "No Head assigned to this department.";
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
-
-
-        [HttpPost]
         public async Task<IActionResult> AssignDoctorAsHead(string userEmail, int departmentId)
         {
             var doctor = await _userManager.FindByEmailAsync(userEmail);
@@ -118,27 +71,95 @@ namespace ScannerWeb.Areas.Dean.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // Remove old head if exists
+            // ---- Remove previous head if exists ----
             if (department.HeadUserID != null)
             {
                 var oldHead = await _userManager.FindByIdAsync(department.HeadUserID);
                 if (oldHead != null)
                 {
+                    // Remove HeadOfDepartment role
                     await _userManager.RemoveFromRoleAsync(oldHead, "HeadOfDepartment");
-                    await _userManager.AddToRoleAsync(oldHead, "Doctor");
+
+                    // Add Doctor role
+                    if (!await _userManager.IsInRoleAsync(oldHead, "Doctor"))
+                        await _userManager.AddToRoleAsync(oldHead, "Doctor");
+
+                    // Update TypeUser
+                    oldHead.TypeUser = "Doctor";
+
+                    // Remove his admin link to the department
+                    oldHead.ManagedDepartment = null;
+                    _context.Users.Update(oldHead);
                 }
             }
 
-            // Assign this doctor as the new head
+            // ---- Assign new head ----
             department.HeadUserID = doctor.Id;
             _context.Update(department);
-            await _context.SaveChangesAsync();
 
-            // Update doctor’s role
+            // Update doctor roles
             await _userManager.RemoveFromRoleAsync(doctor, "Doctor");
             await _userManager.AddToRoleAsync(doctor, "HeadOfDepartment");
 
+            // Update TypeUser
+            doctor.TypeUser = "HeadOfDepartment";
+
+            // Update navigation reference
+            doctor.ManagedDepartment = department;
+
+            _context.Users.Update(doctor);
+            await _context.SaveChangesAsync();
+
             TempData["msg"] = $"{doctor.FirstName} {doctor.LastName} has been assigned as Head of {department.DepartmentName}.";
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveHead(int departmentId)
+        {
+            var dept = await _context.Departments.FindAsync(departmentId);
+            if (dept == null)
+            {
+                TempData["msg"] = "Department not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (dept.HeadUserID == null)
+            {
+                TempData["msg"] = "No head assigned to this department.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var headUser = await _userManager.FindByIdAsync(dept.HeadUserID);
+            if (headUser != null)
+            {
+                // Update roles
+                if (await _userManager.IsInRoleAsync(headUser, "HeadOfDepartment"))
+                    await _userManager.RemoveFromRoleAsync(headUser, "HeadOfDepartment");
+
+                if (!await _userManager.IsInRoleAsync(headUser, "Doctor"))
+                    await _userManager.AddToRoleAsync(headUser, "Doctor");
+
+                // Update TypeUser
+                headUser.TypeUser = "Doctor";
+
+                // Clear navigation link
+                headUser.ManagedDepartment = null;
+
+                _context.Users.Update(headUser);
+            }
+
+            // Remove head from the department
+            dept.HeadUserID = null;
+            _context.Update(dept);
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = $"Head of Department '{headUser?.FirstName} {headUser?.LastName}' reverted to Doctor.";
+
             return RedirectToAction(nameof(Index));
         }
 

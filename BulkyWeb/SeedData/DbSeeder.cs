@@ -6,155 +6,176 @@ namespace ScannerWeb.SeedData
 {
     public static class DbSeeder
     {
-        public static async Task SeedAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context)
+        public static async Task SeedAsync(
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            AppDbContext context)
         {
-            // Ensure Roles Exist
+            // -----------------------------
+            // 1) Roles
+            // -----------------------------
             string[] roles = { "HR", "Dean", "HeadOfDepartment", "Doctor", "Student" };
+
             foreach (var role in roles)
             {
                 if (!await roleManager.RoleExistsAsync(role))
                     await roleManager.CreateAsync(new IdentityRole(role));
             }
 
-            // --- Create Users ---
-            var dean = new ApplicationUser
+            // -----------------------------
+            // 2) Create Users Helper
+            // -----------------------------
+            async Task<ApplicationUser> CreateUser(string email, string first, string last, string role)
             {
-                UserName = "dean1@university.com",
-                Email = "dean1@university.com",
-                FirstName = "Ahmed",
-                LastName = "Hassan",
-                IDNumber = "D001",
-                TypeUser = "Dean",
-                EmailConfirmed = true
-            };
-            var head = new ApplicationUser
-            {
-                UserName = "head1@university.com",
-                Email = "head1@university.com",
-                FirstName = "Sara",
-                LastName = "Yousef",
-                IDNumber = "H001",
-                TypeUser = "HeadOfDepartment",
-                EmailConfirmed = true
-            };
-            var doctor = new ApplicationUser
-            {
-                UserName = "doctor1@university.com",
-                Email = "doctor1@university.com",
-                FirstName = "Omar",
-                LastName = "Ali",
-                IDNumber = "DR001",
-                TypeUser = "Doctor",
-                EmailConfirmed = true
-            };
-            var student = new ApplicationUser
-            {
-                UserName = "student1@university.com",
-                Email = "student1@university.com",
-                FirstName = "Lina",
-                LastName = "Tariq",
-                IDNumber = "S001",
-                TypeUser = "Student",
-                EmailConfirmed = true
-            };
+                var user = await userManager.FindByEmailAsync(email);
+                if (user != null) return user;
 
-            // Helper to create user if not exists
-            async Task CreateUser(ApplicationUser user, string role)
-            {
-                if (await userManager.FindByEmailAsync(user.Email) == null)
+                user = new ApplicationUser
                 {
-                    await userManager.CreateAsync(user, "Test@123"); // default password
-                    await userManager.AddToRoleAsync(user, role);
+                    UserName = email,
+                    Email = email,
+                    FirstName = first,
+                    LastName = last,
+                    EmailConfirmed = true,
+                    TypeUser = role
+                };
+
+                await userManager.CreateAsync(user, "Test@123");
+                await userManager.AddToRoleAsync(user, role);
+
+                return user;
+            }
+
+            // -----------------------------
+            // 3) Fixed Staff + Doctors + Students
+            // -----------------------------
+            var dean = await CreateUser("dean@uni.com", "Ahmad", "Hassan", "Dean");
+
+            var hodCS = await CreateUser("hod.cs@uni.com", "Sara", "Yousef", "HeadOfDepartment");
+            var hodAI = await CreateUser("hod.ai@uni.com", "Othman", "Jaber", "HeadOfDepartment");
+
+            var doc1 = await CreateUser("doctor1@uni.com", "Omar", "Ali", "Doctor");
+            var doc2 = await CreateUser("doctor2@uni.com", "Hadeel", "Salem", "Doctor");
+            var doc3 = await CreateUser("doctor3@uni.com", "Faisal", "Maher", "Doctor");
+            var doc4 = await CreateUser("doctor4@uni.com", "Mona", "Tariq", "Doctor");
+
+            // -----------------------------
+            // 4) Fake Students (20)
+            // -----------------------------
+            List<ApplicationUser> fakeStudents = new();
+
+            if (!context.Users.Any(u => u.Email.StartsWith("fake")))
+            {
+                string[] fNames = { "Lina","Rami","Maya","Omar","Hadi","Samer","Dalal","Tala","Yousef","Khaled",
+                                    "Ruba","Dana","Saif","Fares","Noor","Aya","Bayan","Tariq","Nour","Ahmad" };
+
+                string[] lNames = { "Hassan", "Odeh", "Salem", "Maher", "Tariq", "Khalil", "Haddad", "Masri", "Jaber", "Naser" };
+
+                int index = 1;
+
+                foreach (var fn in fNames)
+                {
+                    var st = new ApplicationUser
+                    {
+                        UserName = $"fake{index}@uni.com",
+                        Email = $"fake{index}@uni.com",
+                        FirstName = fn,
+                        LastName = lNames[index % lNames.Length],
+                        EmailConfirmed = true,
+                        TypeUser = "Student"
+                    };
+
+                    await userManager.CreateAsync(st, "Test@123");
+                    await userManager.AddToRoleAsync(st, "Student");
+
+                    fakeStudents.Add(st);
+                    index++;
                 }
             }
 
-            await CreateUser(dean, "Dean");
-            await CreateUser(head, "HeadOfDepartment");
-            await CreateUser(doctor, "Doctor");
-            await CreateUser(student, "Student");
+            await context.SaveChangesAsync();
 
-            // --- Colleges ---
+            // -----------------------------
+            // 5) Colleges
+            // -----------------------------
             if (!context.Colleges.Any())
             {
-                context.Colleges.Add(new College
-                {
-                    CollegeName = "Engineering College",
-                    Building = "A1",
-                    DeanUserID = (await userManager.FindByEmailAsync(dean.Email)).Id
-                });
+                context.Colleges.AddRange(
+                    new College { CollegeName = "Engineering College", Building = "A1", DeanUserID = dean.Id },
+                    new College { CollegeName = "IT College", Building = "B1", DeanUserID = dean.Id }
+                );
+
                 await context.SaveChangesAsync();
             }
 
-            // --- Departments ---
+            // -----------------------------
+            // 6) Departments
+            // -----------------------------
             if (!context.Departments.Any())
             {
-                var college = context.Colleges.First();
-                context.Departments.Add(new Department
-                {
-                    DepartmentName = "Computer Science",
-                    CollegeID = college.CollegeID,
-                    HeadUserID = (await userManager.FindByEmailAsync(head.Email)).Id
-                });
+                context.Departments.AddRange(
+                    new Department { DepartmentName = "Computer Science", CollegeID = 1, HeadUserID = hodCS.Id },
+                    new Department { DepartmentName = "Artificial Intelligence", CollegeID = 1, HeadUserID = hodAI.Id }
+                );
+
                 await context.SaveChangesAsync();
             }
 
-            // --- Courses ---
+            // -----------------------------
+            // 7) Courses
+            // -----------------------------
             if (!context.Courses.Any())
             {
-                var dept = context.Departments.First();
-                context.Courses.Add(new Course
-                {
-                    CourseName = "Artificial Intelligence",
-                    CourseCode = "AI101",
-                    DepartmentID = dept.DepartmentID
-                });
+                context.Courses.AddRange(
+                    new Course { CourseCode = "CS101", CourseName = "Programming 1", DepartmentID = 1 },
+                    new Course { CourseCode = "CS201", CourseName = "Algorithms", DepartmentID = 1 },
+                    new Course { CourseCode = "AI101", CourseName = "Artificial Intelligence", DepartmentID = 2 },
+                    new Course { CourseCode = "AI202", CourseName = "Machine Learning", DepartmentID = 2 }
+                );
+
                 await context.SaveChangesAsync();
             }
 
-            // --- CourseSections ---
+            // -----------------------------
+            // 8) Sections
+            // -----------------------------
             if (!context.CourseSections.Any())
             {
-                var course = context.Courses.First();
-                context.CourseSections.Add(new CourseSection
-                {
-                    CourseID = course.CourseID,
-                    DoctorUserID = (await userManager.FindByEmailAsync(doctor.Email)).Id,
-                    SemesterID = 1,
-                    SectionNumber = 1,
-                    TotpSecretKey = "ABC123"
-                });
+                context.CourseSections.AddRange(
+                    new CourseSection { CourseID = 1, SemesterID = 1, SectionNumber = 1, DoctorUserID = doc1.Id, TotpSecretKey = "K1" },
+                    new CourseSection { CourseID = 1, SemesterID = 1, SectionNumber = 2, DoctorUserID = doc2.Id, TotpSecretKey = "K2" },
+
+                    new CourseSection { CourseID = 3, SemesterID = 1, SectionNumber = 1, DoctorUserID = doc3.Id, TotpSecretKey = "K3" },
+                    new CourseSection { CourseID = 3, SemesterID = 1, SectionNumber = 2, DoctorUserID = doc4.Id, TotpSecretKey = "K4" }
+                );
+
                 await context.SaveChangesAsync();
             }
 
-            // --- Enroll Students ---
+            // -----------------------------
+            // 9) Enroll Students
+            // -----------------------------
             if (!context.StudentEnrollments.Any())
             {
-                var studentUser = await userManager.FindByEmailAsync(student.Email);
-                var section = context.CourseSections.First();
-                context.StudentEnrollments.Add(new StudentEnrollment
+                var sections = context.CourseSections.ToList();
+                var students = context.Users.Where(u => u.TypeUser == "Student").ToList();
+                var random = new Random();
+
+                foreach (var st in students)
                 {
-                    StudentUserID = studentUser.Id,
-                    CourseSectionID = section.CourseSectionID
-                });
+                    var sec = sections[random.Next(sections.Count)];
+
+                    context.StudentEnrollments.Add(new StudentEnrollment
+                    {
+                        StudentUserID = st.Id,
+                        CourseSectionID = sec.CourseSectionID
+                    });
+                }
+
                 await context.SaveChangesAsync();
             }
 
-            // --- Attendance (optional fake) ---
-            if (!context.AttendanceLogs.Any())
-            {
-                var studentUser = await userManager.FindByEmailAsync(student.Email);
-                var section = context.CourseSections.First();
-                context.AttendanceLogs.Add(new AttendanceLog
-                {
-                    CourseSectionID = section.CourseSectionID,
-                    StudentUserID = studentUser.Id,
-                    AttendanceDate = DateTime.UtcNow.Date,
-                    PresenceStatus = 1,
-                    AttendanceMethod = 3,
-                    VerifiedByUserID = (await userManager.FindByEmailAsync(doctor.Email)).Id
-                });
-                await context.SaveChangesAsync();
-            }
+            // DONE ✔
         }
     }
 }

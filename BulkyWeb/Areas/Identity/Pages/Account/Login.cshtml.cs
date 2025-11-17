@@ -135,13 +135,11 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     }
                     else if (roles.Contains(SD.Role_HeadofDepartment))
                     {
-                        // أعد التوجيه إلى لوحة تحكم الدكتور
-                        return RedirectToAction("Index", "HeadofDepartmentboard");
+                        return RedirectToAction("Index", "Sections", new { area = "HeadOfDepartment" });
                     }
                     else if (roles.Contains(SD.Role_Docter))
                     {
-                        // أعد التوجيه إلى لوحة تحكم الدكتور
-                        return RedirectToAction("Index", "DoctorDashboard");
+                        return RedirectToAction("Index", "Dashboard", new { area = "Doctor" });
                     }
 
                     _logger.LogInformation("User logged in.");

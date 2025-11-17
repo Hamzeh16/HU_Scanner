@@ -32,6 +32,8 @@ public class CourseSection
     public string? TotpSecretKey { get; set; }
 
     // خاصية التنقل لعلاقة "كثير لكثير" (Many-to-Many) [9, 10]
-    public virtual ICollection<StudentEnrollment> Enrollments { get; set; }
+    //public virtual ICollection<StudentEnrollment> Enrollments { get; set; }
+    public virtual ICollection<StudentEnrollment> Enrollments { get; set; } = new List<StudentEnrollment>();
+
 }
 

@@ -338,7 +338,7 @@ namespace ScannerDataAccess.Migrations
                     { "930d89c2-a266-4125-b70b-b00e7222f0ce", "2", "Dean", "Dean" },
                     { "a56420bd-36b0-46d9-94ac-7c151cd88b18", "5", "Student", "Student" },
                     { "d0ac012b-d1a5-4536-9b67-20a131224623", "3", "HeadOfDepartment", "HeadOfDepartment" },
-                    { "dd7f4c8e-007c-43a8-b5cb-6fc245e60539", "4", "Docter", "Doctor" }
+                    { "dd7f4c8e-007c-43a8-b5cb-6fc245e60539", "4", "Doctor", "Doctor" }
                 });
 
             migrationBuilder.CreateIndex(

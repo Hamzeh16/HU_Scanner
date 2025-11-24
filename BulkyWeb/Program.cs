@@ -43,6 +43,8 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;  // لجعل الكوكيز أساسي
 });
 
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -82,6 +84,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllerRoute(
     name: "default",

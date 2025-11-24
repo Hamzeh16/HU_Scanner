@@ -56,9 +56,20 @@
     }
 </style>
 
-<div class="page-header">
-    <h2>📘 Manage Course Sections</h2>
-    <p>Assign doctors to each section</p>
+<div class="page-header d-flex justify-content-between align-items-center">
+
+    <a asp-area="HeadOfDepartment" asp-controller="DepartmentDashboard" asp-action="Index"
+       class="btn btn-light"
+       style="color:#dc3545; font-weight:600; border:2px solid white;">
+        ⬅ Back
+    </a>
+
+    <div class="text-center flex-grow-1">
+        <h2>📘 Manage Course Sections</h2>
+        <p>Assign doctors to each section</p>
+    </div>
+
+    <div style="width:90px;"></div>
 </div>
 
 @if (TempData["msg"] != null)

@@ -9,7 +9,8 @@ using System.Text;
 namespace ScannerWeb.Areas.Doctor.Controllers
 {
     [Area("Doctor")]
-    [Authorize(Roles = "Doctor")]
+    //[Authorize(Roles = "Doctor")]
+    [Authorize(Roles = "Doctor,HeadOfDepartment")]
     public class DashboardController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -19,13 +20,6 @@ namespace ScannerWeb.Areas.Doctor.Controllers
         {
             _userManager = userManager;
             _context = context;
-        }
-
-        // helper class for model binding from checkboxes
-        public class StudentAttendanceInput
-        {
-            public string StudentUserID { get; set; }
-            public bool IsPresent { get; set; }
         }
 
         // ===================== 1) LIST SECTIONS =====================
@@ -316,5 +310,61 @@ namespace ScannerWeb.Areas.Doctor.Controllers
 
             return Json(payload);
         }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [Route("api/attendance/mark")]
+        public async Task<IActionResult> MarkAttendanceByQr([FromBody] AttendanceScanRequest model)
+        {
+            if (model == null)
+                return BadRequest("Invalid request");
+
+            if (string.IsNullOrWhiteSpace(model.Code))
+                return BadRequest("Invalid QR code");
+
+            // Check if student is enrolled 
+            var isEnrolled = await _context.StudentEnrollments
+                .AnyAsync(e =>
+                    e.CourseSectionID == model.SectionId &&
+                    e.StudentUserID == model.StudentUserID);
+
+            if (!isEnrolled)
+                return Unauthorized("Student not enrolled in this section.");
+
+            var today = DateTime.UtcNow.Date;
+
+            var existing = await _context.AttendanceLogs
+                .FirstOrDefaultAsync(a =>
+                    a.CourseSectionID == model.SectionId &&
+                    a.StudentUserID == model.StudentUserID &&
+                    a.AttendanceDate == today);
+
+            if (existing == null)
+            {
+                _context.AttendanceLogs.Add(new AttendanceLog
+                {
+                    CourseSectionID = model.SectionId,
+                    StudentUserID = model.StudentUserID,
+                    AttendanceDate = today,
+                    PresenceStatus = 1,
+                    AttendanceMethod = 1, // mobile scan
+                    ScanTimestamp = DateTime.UtcNow,
+                    QrCode = model.Code
+                });
+            }
+            else
+            {
+                existing.PresenceStatus = 1;
+                existing.AttendanceMethod = 1;
+                existing.ScanTimestamp = DateTime.UtcNow;
+                existing.QrCode = model.Code;
+                _context.AttendanceLogs.Update(existing);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Attendance marked", Status = 1 });
+        }
+
     }
 }

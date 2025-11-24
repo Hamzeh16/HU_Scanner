@@ -135,7 +135,7 @@ namespace BulkyWeb.Areas.Identity.Pages.Account
                     }
                     else if (roles.Contains(SD.Role_HeadofDepartment))
                     {
-                        return RedirectToAction("Index", "Sections", new { area = "HeadOfDepartment" });
+                        return RedirectToAction("Index", "DepartmentDashboard", new { area = "HeadOfDepartment" });
                     }
                     else if (roles.Contains(SD.Role_Docter))
                     {

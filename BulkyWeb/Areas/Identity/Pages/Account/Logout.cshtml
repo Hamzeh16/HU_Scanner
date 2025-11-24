@@ -1,21 +1,69 @@
 ﻿@page
 @model LogoutModel
 @{
-    ViewData["Title"] = "Log out";
+    ViewData["Title"] = "Logout";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    @{
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
-            </form>
-        }
-        else
-        {
-            <p>You have successfully logged out of the application.</p>
-        }
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
     }
-</header>
+
+    .logout-card {
+        max-width: 500px;
+        margin: 80px auto;
+        background: #fff;
+        padding: 35px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    h1 {
+        color: #dc3545;
+        font-weight: 700;
+        margin-bottom: 25px;
+    }
+
+    .btn-logout {
+        background-color: #dc3545;
+        color: #fff;
+        padding: 12px 25px;
+        border-radius: 8px;
+        border: none;
+        font-size: 1.1rem;
+        font-weight: 600;
+        transition: 0.2s ease-in-out;
+    }
+
+        .btn-logout:hover {
+            background-color: #b52a33;
+            transform: translateY(-2px);
+        }
+
+    .success-message {
+        font-size: 1.1rem;
+        color: #198754;
+        font-weight: 600;
+    }
+</style>
+
+<div class="logout-card">
+    <h1>Logout</h1>
+
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <form asp-area="Identity" asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Page("/", new { area = "" })"
+              method="post">
+            <button type="submit" class="btn-logout">
+                🔒 Click here to Logout
+            </button>
+        </form>
+    }
+    else
+    {
+        <p class="success-message">✅ You have successfully logged out.</p>
+    }
+</div>

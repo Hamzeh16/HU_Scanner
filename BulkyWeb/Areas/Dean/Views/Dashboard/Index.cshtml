@@ -68,12 +68,35 @@
     .btn-outline-danger {
         border-width: 2px;
     }
+
+    .logout-btn {
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
 </style>
 
-<div class="dashboard-header text-center">
+<div class="dashboard-header text-center position-relative">
     <h2>🎓 Dean Dashboard</h2>
     <p class="lead mb-0">Overview of your college and departments</p>
+
+    <!-- Logout Button -->
+    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post"
+          class="position-absolute" style="top:20px; right:25px;">
+        <button type="submit" class="btn btn-light fw-bold px-3 py-1 shadow-sm logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+    </form>
 </div>
+
 
 <div class="container">
     <div class="row g-4 text-center">

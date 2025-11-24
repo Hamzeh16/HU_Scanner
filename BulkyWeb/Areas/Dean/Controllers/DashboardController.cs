@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ScannerDataAccess.Data;
 using ScannerModels.Model;
@@ -10,10 +11,12 @@ namespace ScannerWeb.Areas.Dean.Controllers
     public class DashboardController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public DashboardController(AppDbContext context)
+        public DashboardController(AppDbContext context, SignInManager<ApplicationUser> signInManager)
         {
             _context = context;
+            _signInManager = signInManager;
         }
 
         public IActionResult Index()
@@ -27,6 +30,14 @@ namespace ScannerWeb.Areas.Dean.Controllers
             };
             return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Login", "Account");
+        }
+
     }
 
 }

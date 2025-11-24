@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Head of Department Dashboard";
+    string department = ViewBag.DepartmentName ?? "Department";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    /* HEADER */
+    .page-header {
+        background: linear-gradient(90deg, #dc3545, #b02a37);
+        color: #fff;
+        padding: 35px 20px;
+        text-align: center;
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+        margin-bottom: 40px;
+    }
+
+        .page-header h2 {
+            font-weight: 700;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+    /* CARDS */
+    .action-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 35px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: 0.25s ease;
+        border: 2px solid #dc3545;
+    }
+
+        .action-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.12);
+        }
+
+    .action-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #b02a37;
+        margin-bottom: 10px;
+    }
+
+    .action-sub {
+        color: #444;
+        font-size: 15px;
+        margin-bottom: 25px;
+    }
+
+    .btn-red {
+        background: #dc3545;
+        border: none;
+        color: #fff;
+        font-size: 17px;
+        padding: 10px 25px;
+        border-radius: 10px;
+        transition: 0.2s;
+        font-weight: 600;
+    }
+
+        .btn-red:hover {
+            background: #b02a37;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+
+    .logout-btn {
+        border: 2px solid #dc3545;
+        color: #dc3545;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+        .logout-btn:hover {
+            background-color: #dc3545;
+            color: #fff;
+            transform: translateY(-3px);
+        }
+</style>
+
+<div class="page-header">
+    <h2>📘 Head of Department Dashboard</h2>
+    <p>Department: <strong>@department</strong></p>
+    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post"
+          class="position-absolute" style="top:20px; right:25px;">
+        <button type="submit" class="btn btn-light fw-bold px-3 py-1 shadow-sm logout-btn">
+            <i class="bi bi-box-arrow-right"></i> Logout
+        </button>
+    </form>
+</div>
+
+<div class="container">
+    <div class="row g-4 justify-content-center">
+
+        <!-- Card 1 -->
+        <div class="col-md-5">
+            <div class="action-card">
+                <div class="action-title">Assign Doctors to Sections</div>
+                <div class="action-sub">
+                    Manage which doctor teaches each section in your department.
+                </div>
+                <a href="/HeadOfDepartment/Sections/Index" class="btn-red">Manage Assignments</a>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="col-md-5">
+            <div class="action-card">
+                <div class="action-title">View All Department Sections</div>
+                <div class="action-sub">
+                    See the available courses and open them like a doctor.
+                </div>
+                <a href="/Doctor/Dashboard/Index" class="btn-red">View Sections</a>
+            </div>
+        </div>
+
+    </div>
+</div>

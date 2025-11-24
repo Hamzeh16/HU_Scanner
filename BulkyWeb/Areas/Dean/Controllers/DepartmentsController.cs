@@ -27,32 +27,25 @@ namespace ScannerWeb.Areas.Dean.Controllers
                 .Include(d => d.Head)
                 .ToListAsync();
 
-            // Get all Heads and Doctors
-            var heads = await _userManager.GetUsersInRoleAsync("HeadOfDepartment");
-            var doctors = await _userManager.GetUsersInRoleAsync("Doctor");
+            var staff = await _userManager.Users
+                .Where(u => u.TypeUser == "Doctor" || u.TypeUser == "HeadOfDepartment")
+                .Select(u => new
+                {
+                    u.FirstName,
+                    u.LastName,
+                    u.Email,
+                    u.TypeUser,
+                    ManagedDepartment = u.ManagedDepartment,
+                    Role = u.TypeUser == "HeadOfDepartment" ? "Head of Department" : "Doctor"
+                })
+                .ToListAsync();
 
-            // Merge into one list and tag their role
-            var allStaff = heads.Select(u => new
-            {
-                u.FirstName,
-                u.LastName,
-                u.Email,
-                u.ManagedDepartment,
-                Role = "Head of Department"
-            })
-            .Concat(doctors.Select(u => new
-            {
-                u.FirstName,
-                u.LastName,
-                u.Email,
-                u.ManagedDepartment,
-                Role = "Doctor"
-            }))
-            .ToList();
+            ViewBag.Staff = staff;
+            ViewBag.Departments = departments;
 
-            ViewBag.Staff = allStaff;
             return View(departments);
         }
+
 
         [HttpPost]
         public async Task<IActionResult> AssignDoctorAsHead(string userEmail, int departmentId)

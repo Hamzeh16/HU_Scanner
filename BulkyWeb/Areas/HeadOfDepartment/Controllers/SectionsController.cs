@@ -20,88 +20,6 @@ namespace ScannerWeb.Areas.HeadOfDepartment.Controllers
             _userManager = userManager;
         }
 
-        //public async Task<IActionResult> Index()
-        //{
-        //    var hod = await _userManager.GetUserAsync(User);
-
-        //    // احضر القسم الذي يديره الرئيس
-        //    var department = await _context.Departments
-        //        .FirstOrDefaultAsync(d => d.HeadUserID == hod.Id);
-
-        //    if (department == null)
-        //    {
-        //        TempData["msg"] = "You are not assigned to any department yet.";
-        //        return RedirectToAction("Index", "Dashboard");
-        //    }
-
-        //    int departmentId = department.DepartmentID;
-
-        //    // هنا المشكلة — يجب Include Doctor
-        //    var sections = await _context.CourseSections
-        //        .Include(s => s.Course)
-        //        .Include(s => s.Doctor)
-        //        .Where(s => s.Course.DepartmentID == departmentId)
-        //        .ToListAsync();
-
-        //    // احضر دكاترة نفس القسم فقط
-        //    var doctors = await _userManager.Users
-        //        .Include(u => u.ManagedDepartment)
-        //        .Where(u =>
-        //            u.TypeUser == "Doctor" ||
-        //            u.TypeUser == "HeadOfDepartment"
-        //        )
-        //        .ToListAsync();
-
-        //    ViewBag.Doctors = doctors;
-
-        //    return View(sections);
-        //}
-
-
-        //// ------------------- ASSIGN DOCTOR -------------------
-        //[HttpPost]
-        //public async Task<IActionResult> AssignDoctor(long sectionId, string doctorId)
-        //{
-        //    var section = await _context.CourseSections
-        //        .FirstOrDefaultAsync(s => s.CourseSectionID == sectionId);
-
-        //    if (section == null)
-        //    {
-        //        TempData["msg"] = "Section not found.";
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    section.DoctorUserID = doctorId;
-        //    await _context.SaveChangesAsync();
-
-        //    // reload navigation
-        //    await _context.Entry(section).Reference(s => s.Doctor).LoadAsync();
-
-        //    TempData["msg"] = "Doctor assigned successfully.";
-        //    return RedirectToAction("Index");
-        //}
-
-
-        //// ------------------- REMOVE DOCTOR -------------------
-        //[HttpPost]
-        //public async Task<IActionResult> RemoveDoctor(long sectionId)
-        //{
-        //    var section = await _context.CourseSections
-        //        .FirstOrDefaultAsync(s => s.CourseSectionID == sectionId);
-
-        //    if (section == null)
-        //    {
-        //        TempData["msg"] = "Section not found.";
-        //        return RedirectToAction("Index");
-        //    }
-
-        //    section.DoctorUserID = null;
-        //    await _context.SaveChangesAsync();
-
-        //    TempData["msg"] = "Doctor removed from section.";
-        //    return RedirectToAction("Index");
-        //}
-
         public async Task<IActionResult> Index()
         {
             var hod = await _userManager.GetUserAsync(User);
@@ -156,8 +74,6 @@ namespace ScannerWeb.Areas.HeadOfDepartment.Controllers
         }
 
 
-
-
         [HttpPost]
         public async Task<IActionResult> AssignDoctor(long sectionId, string doctorId)
         {
@@ -181,7 +97,6 @@ namespace ScannerWeb.Areas.HeadOfDepartment.Controllers
         }
 
 
-
         [HttpPost]
         public async Task<IActionResult> RemoveDoctor(long sectionId)
         {
@@ -201,7 +116,6 @@ namespace ScannerWeb.Areas.HeadOfDepartment.Controllers
             TempData["msg"] = "Doctor removed.";
             return RedirectToAction("Index");
         }
-
 
     }
 }

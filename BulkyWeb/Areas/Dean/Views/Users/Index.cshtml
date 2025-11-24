@@ -105,9 +105,20 @@
         }
 </style>
 
-<div class="page-header">
-    <h2>🔐 Reset User Passwords</h2>
-    <p class="mb-0">Select a user to securely reset their password</p>
+<div class="page-header d-flex justify-content-between align-items-center">
+
+    <a asp-area="Dean" asp-controller="Dashboard" asp-action="Index"
+       class="btn btn-light"
+       style="color:#dc3545; font-weight:600; border:2px solid white;">
+        ⬅ Back
+    </a>
+
+    <div class="text-center flex-grow-1">
+        <h2>🔐 Reset User Passwords</h2>
+        <p class="mb-0">Select a user to securely reset their password</p>
+    </div>
+
+    <div style="width:90px;"></div>
 </div>
 
 @if (TempData["msg"] != null)

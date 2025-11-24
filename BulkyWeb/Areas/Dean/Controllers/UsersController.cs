@@ -24,7 +24,6 @@ namespace ScannerWeb.Areas.Dean.Controllers
             return View(allUsers);
         }
 
-        [HttpPost]
         public async Task<IActionResult> ResetPassword(string userId, string newPassword)
         {
             if (string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(newPassword))

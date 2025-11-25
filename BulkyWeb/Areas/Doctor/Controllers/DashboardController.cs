@@ -138,6 +138,7 @@ namespace ScannerWeb.Areas.Doctor.Controllers
             return RedirectToAction(nameof(Section), new { id = sectionId });
         }
 
+
         // ===================== 4) DOWNLOAD "EXCEL" (CSV) =====================
         [HttpGet]
         public async Task<IActionResult> DownloadExcel(long id)

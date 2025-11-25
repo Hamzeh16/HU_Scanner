@@ -39,7 +39,10 @@ namespace ScannerWeb.Areas.HeadOfDepartment.Controllers
             var sections = await _context.CourseSections
                 .Include(s => s.Course)
                 .Where(s => s.Course.DepartmentID == deptId)
+                .GroupBy(s => s.CourseID)
+                .Select(g => g.First())
                 .ToListAsync();
+
 
             // Build ViewModel
             List<SectionVM> model = new();

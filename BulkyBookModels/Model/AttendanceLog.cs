@@ -43,7 +43,7 @@ public class AttendanceLog
     [ForeignKey("Verifier")]
     public string? VerifiedByUserID { get; set; } // يشير إلى AspNetUsers.Id
     public virtual ApplicationUser? Verifier { get; set; }
-    public string QrCode { get; set; }
+    public string? QrCode { get; set; }
 }
 
 public class AttendanceScanRequest

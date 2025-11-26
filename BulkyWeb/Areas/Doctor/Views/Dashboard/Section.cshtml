@@ -156,8 +156,10 @@
                     <th>Email</th>
                     <th>Absence Count</th>
                     <th>Present</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
+
             <tbody>
                 @{
                     int i = 0;
@@ -178,19 +180,25 @@
                         <td>@e.Student.IDNumber</td>
                         <td>@e.Student.Email</td>
                         <td>@abs</td>
+
                         <td>
                             <input type="hidden" name="students[@(i - 1)].StudentUserID" value="@e.StudentUserID" />
-
                             <input type="checkbox" name="students[@(i - 1)].IsPresent" value="true" checked />
                         </td>
 
+                        <td>
+                            <a href="@Url.Action("AbsenceDetails", "Dashboard",
+                                                           new { area = "Doctor", studentId = e.StudentUserID, sectionId = Model.CourseSectionID })"
+                           class="btn btn-sm btn-outline-danger">
+                            View Details 📄
+                        </a>
+                    </td>
+
                     </tr>
-                }
+                                }
             </tbody>
-
-
-
         </table>
+
 
         <div class="d-flex justify-content-end mt-3">
             <button type="submit" class="btn btn-danger">

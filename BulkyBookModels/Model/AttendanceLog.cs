@@ -44,6 +44,8 @@ public class AttendanceLog
     public string? VerifiedByUserID { get; set; } // يشير إلى AspNetUsers.Id
     public virtual ApplicationUser? Verifier { get; set; }
     public string? QrCode { get; set; }
+    public bool? IsExcused { get; set; }              // true = عذر مقبول
+    public string? ExcuseDocumentPath { get; set; }   // مسار ملف PDF / Image
 }
 
 public class AttendanceScanRequest

@@ -367,5 +367,41 @@ namespace ScannerWeb.Areas.Doctor.Controllers
             return Ok(new { Message = "Attendance marked", Status = 1 });
         }
 
+        public async Task<IActionResult> AbsenceDetails(string studentId, long sectionId)
+        {
+            var logs = await _context.AttendanceLogs
+                .Where(a => a.StudentUserID == studentId && a.CourseSectionID == sectionId)
+                .OrderByDescending(a => a.AttendanceDate)
+                .ToListAsync();
+
+            ViewBag.Student = await _context.Users.FirstOrDefaultAsync(u => u.Id == studentId);
+            ViewBag.Section = await _context.CourseSections
+                .Include(s => s.Course)
+                .FirstOrDefaultAsync(s => s.CourseSectionID == sectionId);
+
+            return View(logs);
+        }
+
+        [HttpPost]
+        [Area("Doctor")]
+        public async Task<IActionResult> UpdateExcuses(string studentId, long sectionId, List<AttendanceLog> logs)
+        {
+            foreach (var log in logs)
+            {
+                var record = await _context.AttendanceLogs
+                    .FirstOrDefaultAsync(a => a.AttendanceLogID == log.AttendanceLogID);
+
+                if (record != null)
+                {
+                    record.IsExcused = log.IsExcused;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["msg"] = "Excuse status updated successfully!";
+            return RedirectToAction("AbsenceDetails", new { studentId = studentId, sectionId = sectionId });
+        }
+
     }
 }

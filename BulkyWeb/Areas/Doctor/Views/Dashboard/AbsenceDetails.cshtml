@@ -1,0 +1,157 @@
+﻿@model List<ScannerModels.Model.AttendanceLog>
+
+@{
+    var student = ViewBag.Student as ScannerModels.Model.ApplicationUser;
+    var section = ViewBag.Section as ScannerModels.Model.CourseSection;
+
+    ViewData["Title"] = "Absence Details";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .page-header {
+        background: linear-gradient(90deg, #dc3545, #b02a37);
+        color: #fff;
+        padding: 25px 20px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin-bottom: 35px;
+    }
+
+    .table {
+        background: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    thead.table-danger th {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        text-align: center;
+    }
+
+    td, th {
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .btn-file {
+        border: 2px solid #dc3545;
+        background: white;
+        color: #dc3545;
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-weight: 600;
+        transition: 0.2s ease;
+    }
+
+        .btn-file:hover {
+            background: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    .note {
+        font-size: 14px;
+        color: #555;
+        margin-top: -8px;
+    }
+</style>
+
+<div class="page-header text-center">
+    <h2 class="mb-2">📄 Absence Details</h2>
+
+    <p class="mb-1 fs-5">
+        <strong>Student:</strong> @student.FirstName @student.LastName
+    </p>
+
+    <p class="fs-6">
+        <strong>Course:</strong> @(section.Course.CourseName) — Section @(section.SectionNumber)
+    </p>
+</div>
+
+@if (TempData["msg"] != null)
+{
+    <div class="alert alert-success text-center fw-bold">
+        @TempData["msg"]
+    </div>
+}
+
+
+<div class="container">
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            This student has <strong>no absence records</strong>.
+        </div>
+    }
+    else
+    {
+        <form asp-action="UpdateExcuses" method="post">
+    <input type="hidden" name="studentId" value="@student.Id" />
+            <input type="hidden" name="sectionId" value="@(section.CourseSectionID)" />
+
+    <table class="table table-bordered">
+        <thead class="table-danger">
+            <tr>
+                <th>#</th>
+                <th>Date</th>
+                <th>Method</th>
+                <th>Excused</th>
+                <th>Report File</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @{
+                int i = 0;
+            }
+
+            @for (int x = 0; x < Model.Count; x++)
+            {
+                <tr>
+                    <td>@(++i)</td>
+
+                    <td>@Model[x].AttendanceDate.ToString("yyyy-MM-dd")</td>
+
+                    <td>
+                        @if (Model[x].AttendanceMethod == 1) { <span>QR Scan</span> }
+                        else if (Model[x].AttendanceMethod == 2) { <span>Excel Import</span> }
+                        else if (Model[x].AttendanceMethod == 3) { <span>Manual</span> }
+                    </td>
+
+                    <td>
+                        <input type="hidden" name="logs[@x].AttendanceLogID" value="@Model[x].AttendanceLogID" />
+                        <input type="checkbox" name="logs[@x].IsExcused" value="true" @(Model[x].IsExcused == true ? "checked" : "") />
+                    </td>
+
+                    <td>
+                        @if (!string.IsNullOrEmpty(Model[x].ExcuseDocumentPath))
+                        {
+                            <a href="@Model[x].ExcuseDocumentPath" target="_blank" class="btn btn-outline-danger btn-sm">
+                                View File 📎
+                            </a>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No file</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-end mt-3">
+        <button class="btn btn-danger">💾 Save Changes</button>
+    </div>
+</form>
+
+    }
+</div>

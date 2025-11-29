@@ -102,7 +102,7 @@
             <tr>
                 <th>#</th>
                 <th>Date</th>
-                <th>Method</th>
+                @* <th>Method</th> *@
                 <th>Excused</th>
                 <th>Report File</th>
             </tr>
@@ -120,11 +120,11 @@
 
                     <td>@Model[x].AttendanceDate.ToString("yyyy-MM-dd")</td>
 
-                    <td>
+                    @* <td>
                         @if (Model[x].AttendanceMethod == 1) { <span>QR Scan</span> }
                         else if (Model[x].AttendanceMethod == 2) { <span>Excel Import</span> }
                         else if (Model[x].AttendanceMethod == 3) { <span>Manual</span> }
-                    </td>
+                    </td> *@
 
                     <td>
                         <input type="hidden" name="logs[@x].AttendanceLogID" value="@Model[x].AttendanceLogID" />

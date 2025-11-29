@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ScannerModels.Model;
@@ -59,4 +60,11 @@ public class StudentAttendanceInput
 {
     public string StudentUserID { get; set; }
     public bool IsPresent { get; set; }
+}
+
+public class ExcuseUploadRequest
+{
+    public long SectionId { get; set; }
+    public string StudentUserID { get; set; }
+    public IFormFile File { get; set; }
 }

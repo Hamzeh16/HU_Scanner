@@ -1,7 +1,7 @@
 ﻿// Minimal Login Form JavaScript
 class MinimalLoginForm {
     constructor() {
-        this.form = document.getElementById('loginForm');
+        this.form = document.getElementById('account');
         this.emailInput = document.getElementById('email');
         this.passwordInput = document.getElementById('password');
         this.passwordToggle = document.getElementById('passwordToggle');
@@ -17,7 +17,7 @@ class MinimalLoginForm {
     }
 
     bindEvents() {
-        this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        //this.form.addEventListener('submit', (e) => this.handleSubmit(e));
         this.emailInput.addEventListener('blur', () => this.validateEmail());
         this.passwordInput.addEventListener('blur', () => this.validatePassword());
         this.emailInput.addEventListener('input', () => this.clearError('email'));
@@ -89,46 +89,6 @@ class MinimalLoginForm {
         }, 200);
     }
 
-    async handleSubmit(e) {
-        e.preventDefault();
-
-        const isEmailValid = this.validateEmail();
-        const isPasswordValid = this.validatePassword();
-
-        if (!isEmailValid || !isPasswordValid) {
-            return;
-        }
-
-        this.setLoading(true);
-
-        try {
-            // Simulate API call
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            // Show success state
-            this.showSuccess();
-        } catch (error) {
-            this.showError('password', 'Login failed. Please try again.');
-        } finally {
-            this.setLoading(false);
-        }
-    }
-
-    setLoading(loading) {
-        this.submitButton.classList.toggle('loading', loading);
-        this.submitButton.disabled = loading;
-    }
-
-    showSuccess() {
-        this.form.style.display = 'none';
-        this.successMessage.classList.add('show');
-
-        // Simulate redirect after 2 seconds
-        setTimeout(() => {
-            console.log('Redirecting to dashboard...');
-            // window.location.href = '/dashboard';
-        }, 2000);
-    }
 }
 
 // Initialize the form when DOM is loaded

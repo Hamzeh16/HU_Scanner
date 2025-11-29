@@ -111,7 +111,10 @@
 <div class="container mb-4">
     <div class="row g-4">
         <div class="col-md-4">
-            <div class="qr-box">
+            <button id="toggleQrBtn" class="btn btn-danger-soft mb-3">
+                ▶ Activate QR Code
+            </button>
+            <div class="qr-box" id="qrBox" style="display:none;">
                 <div id="qrContainer"></div>
                 <div class="qr-caption">
                     Students scan this QR from their app to mark attendance.
@@ -209,13 +212,16 @@
 </div>
 
 @section Scripts {
-    <!-- QRCode.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        const sectionId = @Model.CourseSectionID;
+
         const qrContainer = document.getElementById("qrContainer");
-        let qr;
+        const qrBox = document.getElementById("qrBox");
+        const toggleBtn = document.getElementById("toggleQrBtn");
+
+        let qrInterval = null;
+        let qr = null;
 
         function renderQr(text) {
             qrContainer.innerHTML = "";
@@ -226,22 +232,40 @@
             });
         }
 
-        async function refreshQr() {
-            try {
-                const url = '@Url.Action("GenerateQr", "Dashboard", new { area = "Doctor", sectionId = Model.CourseSectionID })';
-                const resp = await fetch(url);
-                const data = await resp.json();
-                const payload = JSON.stringify(data);
-                renderQr(payload);
-            } catch (e) {
-                console.error("Error generating QR", e);
-            } finally {
-                setTimeout(refreshQr, 5000); // refresh every 5s
-            }
+        async function loadQrOnce() {
+            const url = '@Url.Action("GenerateQr", "Dashboard", new { area = "Doctor", sectionId = Model.CourseSectionID })';
+            const resp = await fetch(url);
+            const data = await resp.json();
+            renderQr(JSON.stringify(data));
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            refreshQr();
+        function startQr() {
+            qrBox.style.display = "inline-block";
+            toggleBtn.textContent = "⛔ Stop QR Code";
+
+            loadQrOnce(); // load first QR immediately
+
+            qrInterval = setInterval(() => {
+                loadQrOnce();
+            }, 5000);
+        }
+
+        function stopQr() {
+            qrBox.style.display = "none";
+            toggleBtn.textContent = "▶ Activate QR Code";
+
+            clearInterval(qrInterval);
+            qrInterval = null;
+        }
+
+        toggleBtn.addEventListener("click", function () {
+            if (qrInterval === null) {
+                startQr();
+            } else {
+                stopQr();
+            }
         });
+
     </script>
 }
+

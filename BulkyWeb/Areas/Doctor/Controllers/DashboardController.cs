@@ -312,185 +312,185 @@ namespace ScannerWeb.Areas.Doctor.Controllers
             return Json(payload);
         }
 
-        [HttpPost]
-        [AllowAnonymous]
-        [Route("api/attendance/mark")]
-        public async Task<IActionResult> MarkAttendanceByQr([FromBody] AttendanceScanRequest model)
-        {
-            if (model == null)
-                return BadRequest("Invalid request");
+        //[HttpPost]
+        //[AllowAnonymous]
+        //[Route("api/attendance/mark")]
+        //public async Task<IActionResult> MarkAttendanceByQr([FromBody] AttendanceScanRequest model)
+        //{
+        //    if (model == null)
+        //        return BadRequest("Invalid request");
 
-            if (string.IsNullOrWhiteSpace(model.Code))
-                return BadRequest("Invalid QR code");
+        //    if (string.IsNullOrWhiteSpace(model.Code))
+        //        return BadRequest("Invalid QR code");
 
-            // Check if student is enrolled 
-            var isEnrolled = await _context.StudentEnrollments
-                .AnyAsync(e =>
-                    e.CourseSectionID == model.SectionId &&
-                    e.StudentUserID == model.StudentUserID);
+        //    // Check if student is enrolled 
+        //    var isEnrolled = await _context.StudentEnrollments
+        //        .AnyAsync(e =>
+        //            e.CourseSectionID == model.SectionId &&
+        //            e.StudentUserID == model.StudentUserID);
 
-            if (!isEnrolled)
-                return Unauthorized("Student not enrolled in this section.");
+        //    if (!isEnrolled)
+        //        return Unauthorized("Student not enrolled in this section.");
 
-            var today = DateTime.UtcNow.Date;
+        //    var today = DateTime.UtcNow.Date;
 
-            var existing = await _context.AttendanceLogs
-                .FirstOrDefaultAsync(a =>
-                    a.CourseSectionID == model.SectionId &&
-                    a.StudentUserID == model.StudentUserID &&
-                    a.AttendanceDate == today);
+        //    var existing = await _context.AttendanceLogs
+        //        .FirstOrDefaultAsync(a =>
+        //            a.CourseSectionID == model.SectionId &&
+        //            a.StudentUserID == model.StudentUserID &&
+        //            a.AttendanceDate == today);
 
-            if (existing == null)
-            {
-                _context.AttendanceLogs.Add(new AttendanceLog
-                {
-                    CourseSectionID = model.SectionId,
-                    StudentUserID = model.StudentUserID,
-                    AttendanceDate = today,
-                    PresenceStatus = 1,
-                    AttendanceMethod = 1, // mobile scan
-                    ScanTimestamp = DateTime.UtcNow,
-                    QrCode = model.Code
-                });
-            }
-            else
-            {
-                existing.PresenceStatus = 1;
-                existing.AttendanceMethod = 1;
-                existing.ScanTimestamp = DateTime.UtcNow;
-                existing.QrCode = model.Code;
-                _context.AttendanceLogs.Update(existing);
-            }
+        //    if (existing == null)
+        //    {
+        //        _context.AttendanceLogs.Add(new AttendanceLog
+        //        {
+        //            CourseSectionID = model.SectionId,
+        //            StudentUserID = model.StudentUserID,
+        //            AttendanceDate = today,
+        //            PresenceStatus = 1,
+        //            AttendanceMethod = 1, // mobile scan
+        //            ScanTimestamp = DateTime.UtcNow,
+        //            QrCode = model.Code
+        //        });
+        //    }
+        //    else
+        //    {
+        //        existing.PresenceStatus = 1;
+        //        existing.AttendanceMethod = 1;
+        //        existing.ScanTimestamp = DateTime.UtcNow;
+        //        existing.QrCode = model.Code;
+        //        _context.AttendanceLogs.Update(existing);
+        //    }
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "Attendance marked", Status = 1 });
-        }
+        //    return Ok(new { Message = "Attendance marked", Status = 1 });
+        //}
 
-        [HttpPost]
-        [Route("api/attendance/upload-excuse")]
-        [AllowAnonymous]
-        public async Task<IActionResult> UploadExcuse([FromForm] ExcuseUploadRequest model)
-        {
-            if (model == null || model.File == null)
-                return BadRequest("Invalid request");
+        //[HttpPost]
+        //[Route("api/attendance/upload-excuse")]
+        //[AllowAnonymous]
+        //public async Task<IActionResult> UploadExcuse([FromForm] ExcuseUploadRequest model)
+        //{
+        //    if (model == null || model.File == null)
+        //        return BadRequest("Invalid request");
 
-            // 1) التأكد أن الطالب مسجل في الشعبة
-            bool enrolled = await _context.StudentEnrollments
-                .AnyAsync(e => e.CourseSectionID == model.SectionId &&
-                               e.StudentUserID == model.StudentUserID);
+        //    // 1) التأكد أن الطالب مسجل في الشعبة
+        //    bool enrolled = await _context.StudentEnrollments
+        //        .AnyAsync(e => e.CourseSectionID == model.SectionId &&
+        //                       e.StudentUserID == model.StudentUserID);
 
-            if (!enrolled)
-                return Unauthorized("Student not enrolled in this section.");
+        //    if (!enrolled)
+        //        return Unauthorized("Student not enrolled in this section.");
 
-            // 2) البحث عن آخر يوم غياب للطالب في هذه الشعبة (يوم واحد أو أكثر)
-            var log = await _context.AttendanceLogs
-                .Where(a => a.CourseSectionID == model.SectionId &&
-                            a.StudentUserID == model.StudentUserID &&
-                            a.PresenceStatus == 0) // 0 = absent
-                .OrderByDescending(a => a.AttendanceDate)
-                .FirstOrDefaultAsync();
+        //    // 2) البحث عن آخر يوم غياب للطالب في هذه الشعبة (يوم واحد أو أكثر)
+        //    var log = await _context.AttendanceLogs
+        //        .Where(a => a.CourseSectionID == model.SectionId &&
+        //                    a.StudentUserID == model.StudentUserID &&
+        //                    a.PresenceStatus == 0) // 0 = absent
+        //        .OrderByDescending(a => a.AttendanceDate)
+        //        .FirstOrDefaultAsync();
 
-            if (log == null)
-                return BadRequest("No absence record found. You can only upload excuse for an absence.");
+        //    if (log == null)
+        //        return BadRequest("No absence record found. You can only upload excuse for an absence.");
 
-            // 3) تجهيز مسار التخزين الجديد
-            string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+        //    // 3) تجهيز مسار التخزين الجديد
+        //    string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
 
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+        //    if (!Directory.Exists(uploadsFolder))
+        //        Directory.CreateDirectory(uploadsFolder);
 
-            string extension = Path.GetExtension(model.File.FileName).ToLower();
-            var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };
+        //    string extension = Path.GetExtension(model.File.FileName).ToLower();
+        //    var allowed = new[] { ".pdf", ".png", ".jpg", ".jpeg" };
 
-            if (!allowed.Contains(extension))
-                return BadRequest("Only PDF or image files are allowed.");
+        //    if (!allowed.Contains(extension))
+        //        return BadRequest("Only PDF or image files are allowed.");
 
-            string fileName = $"{Guid.NewGuid()}{extension}";
-            string savePath = Path.Combine(uploadsFolder, fileName);
+        //    string fileName = $"{Guid.NewGuid()}{extension}";
+        //    string savePath = Path.Combine(uploadsFolder, fileName);
 
-            using (var stream = new FileStream(savePath, FileMode.Create))
-            {
-                await model.File.CopyToAsync(stream);
-            }
+        //    using (var stream = new FileStream(savePath, FileMode.Create))
+        //    {
+        //        await model.File.CopyToAsync(stream);
+        //    }
 
-            // 4) تعديل السجل الموجود مسبقاً
-            log.ExcuseDocumentPath = $"/uploads/{fileName}";
-            log.IsExcused = true;
+        //    // 4) تعديل السجل الموجود مسبقاً
+        //    log.ExcuseDocumentPath = $"/uploads/{fileName}";
+        //    log.IsExcused = true;
 
-            await _context.SaveChangesAsync();
+        //    await _context.SaveChangesAsync();
 
-            return Ok(new
-            {
-                Message = "Excuse uploaded successfully",
-                Status = 1,
-                FilePath = log.ExcuseDocumentPath
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        Message = "Excuse uploaded successfully",
+        //        Status = 1,
+        //        FilePath = log.ExcuseDocumentPath
+        //    });
+        //}
 
-        [HttpGet]
-        [Route("api/attendance/details")]
-        public async Task<IActionResult> GetAbsenceDetails(string studentId, long sectionId)
-        {
-            if (string.IsNullOrWhiteSpace(studentId))
-                return BadRequest("Invalid student ID");
+        //[HttpGet]
+        //[Route("api/attendance/details")]
+        //public async Task<IActionResult> GetAbsenceDetails(string studentId, long sectionId)
+        //{
+        //    if (string.IsNullOrWhiteSpace(studentId))
+        //        return BadRequest("Invalid student ID");
 
-            // 1) Logs list
-            var logs = await _context.AttendanceLogs
-                .Where(a => a.StudentUserID == studentId && a.CourseSectionID == sectionId)
-                .OrderByDescending(a => a.AttendanceDate)
-                .Select(a => new
-                {
-                    a.AttendanceLogID,
-                    a.AttendanceDate,
-                    a.PresenceStatus,
-                    a.AttendanceMethod,
-                    a.QrCode,
-                    a.ScanTimestamp,
-                    a.IsExcused,
-                    a.ExcuseDocumentPath
-                })
-                .ToListAsync();
+        //    // 1) Logs list
+        //    var logs = await _context.AttendanceLogs
+        //        .Where(a => a.StudentUserID == studentId && a.CourseSectionID == sectionId)
+        //        .OrderByDescending(a => a.AttendanceDate)
+        //        .Select(a => new
+        //        {
+        //            a.AttendanceLogID,
+        //            a.AttendanceDate,
+        //            a.PresenceStatus,
+        //            a.AttendanceMethod,
+        //            a.QrCode,
+        //            a.ScanTimestamp,
+        //            a.IsExcused,
+        //            a.ExcuseDocumentPath
+        //        })
+        //        .ToListAsync();
 
-            // 2) Student info
-            var student = await _context.Users
-                .Where(u => u.Id == studentId)
-                .Select(u => new
-                {
-                    u.Id,
-                    u.FirstName,
-                    u.LastName,
-                    u.Email,
-                    u.IDNumber
-                })
-                .FirstOrDefaultAsync();
+        //    // 2) Student info
+        //    var student = await _context.Users
+        //        .Where(u => u.Id == studentId)
+        //        .Select(u => new
+        //        {
+        //            u.Id,
+        //            u.FirstName,
+        //            u.LastName,
+        //            u.Email,
+        //            u.IDNumber
+        //        })
+        //        .FirstOrDefaultAsync();
 
-            if (student == null)
-                return NotFound("Student not found.");
+        //    if (student == null)
+        //        return NotFound("Student not found.");
 
-            // 3) Section info
-            var section = await _context.CourseSections
-                .Include(s => s.Course)
-                .Where(s => s.CourseSectionID == sectionId)
-                .Select(s => new
-                {
-                    s.CourseSectionID,
-                    s.SectionNumber,
-                    CourseName = s.Course.CourseName,
-                    DepartmentName = s.Course.Department.DepartmentName
-                })
-                .FirstOrDefaultAsync();
+        //    // 3) Section info
+        //    var section = await _context.CourseSections
+        //        .Include(s => s.Course)
+        //        .Where(s => s.CourseSectionID == sectionId)
+        //        .Select(s => new
+        //        {
+        //            s.CourseSectionID,
+        //            s.SectionNumber,
+        //            CourseName = s.Course.CourseName,
+        //            DepartmentName = s.Course.Department.DepartmentName
+        //        })
+        //        .FirstOrDefaultAsync();
 
-            if (section == null)
-                return NotFound("Section not found.");
+        //    if (section == null)
+        //        return NotFound("Section not found.");
 
-            return Ok(new
-            {
-                Student = student,
-                Section = section,
-                AttendanceLogs = logs
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        Student = student,
+        //        Section = section,
+        //        AttendanceLogs = logs
+        //    });
+        //}
 
 
         public async Task<IActionResult> AbsenceDetails(string studentId, long sectionId)

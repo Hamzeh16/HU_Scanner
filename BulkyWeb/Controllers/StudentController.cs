@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using ScannerDataAccess.Data;
 using ScannerModels.Model;
 
-namespace ScannerWeb.Controllers.Api
+namespace ScannerWeb.Controllers
 {
     [ApiController]
     [Route("api/student")]
@@ -25,12 +25,18 @@ namespace ScannerWeb.Controllers.Api
         // 1) Get my course sections
         // ============================================
         [HttpGet("sections")]
-        public async Task<IActionResult> GetMySections()
+        public async Task<IActionResult> GetMySections([FromQuery] string studentId)
         {
-            var student = await _userManager.GetUserAsync(User);
+            if (string.IsNullOrWhiteSpace(studentId))
+                return BadRequest("studentId is required.");
+
+            // Verify student exists
+            var student = await _userManager.FindByIdAsync(studentId);
+            if (student == null)
+                return NotFound("Student not found.");
 
             var sections = await _context.StudentEnrollments
-                .Where(e => e.StudentUserID == student.Id)
+                .Where(e => e.StudentUserID == studentId)
                 .Select(e => new
                 {
                     e.CourseSection.CourseSectionID,
@@ -49,12 +55,18 @@ namespace ScannerWeb.Controllers.Api
         // 2) Get attendance summary for a section
         // ============================================
         [HttpGet("attendance/{sectionId:long}")]
-        public async Task<IActionResult> GetAttendance(long sectionId)
+        public async Task<IActionResult> GetAttendance(long sectionId, [FromQuery] string studentId)
         {
-            var student = await _userManager.GetUserAsync(User);
+            if (string.IsNullOrWhiteSpace(studentId))
+                return BadRequest("studentId is required.");
+
+            // Check student exists
+            var student = await _userManager.FindByIdAsync(studentId);
+            if (student == null)
+                return NotFound("Student not found.");
 
             var logs = await _context.AttendanceLogs
-                .Where(a => a.CourseSectionID == sectionId && a.StudentUserID == student.Id)
+                .Where(a => a.CourseSectionID == sectionId && a.StudentUserID == studentId)
                 .OrderBy(a => a.AttendanceDate)
                 .ToListAsync();
 
@@ -91,6 +103,7 @@ namespace ScannerWeb.Controllers.Api
                 details
             });
         }
+
 
 
         // ============================================
